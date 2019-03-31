@@ -1,10 +1,12 @@
 // Import dependencies
 // Need std io including errorkind, read, write and self
-use std::io::{self, ErrorKind, Read, Write}
+use std::io::{self, ErrorKind, Read, Write};
 // Need std net tcpstream
 use std::net::TcpStream;
 // Need std sync mpsc extending self and TryRecvError
 use std::sync::mpsc::{self, TryRecvError};
+// Need std thread
+use std::thread;
 // Need std time duration
 use std::time::Duration;
 
@@ -24,11 +26,11 @@ fn main() {
     // Spawn a thread (literally) passing in a move closure loop
     thread::spawn(move || loop {
         // Create mutable buff equal to mutable vector containing 0, msg_size
-        let mut buff = vec![0, MSG_SIZE];
+        let mut buff = vec![0; MSG_SIZE];
         // Match on client read exact passing in ref to mutable buff
         match client.read_exact(&mut buff) {
             // If we get Ok pass in _ and return...
-            if Ok(_) => {
+            Ok(_) => {
                 // Create reassignable msg var equal to iterable buff calling take_while checking to see if references inside are = to 0
                 // Collect the result into a vector
                 let msg = buff.into_iter().take_while(|&x| x != 0).collect::<Vec<_>>();
@@ -52,7 +54,7 @@ fn main() {
                 // Create mutable variable buff which is equal to the message, cloned and into bytes;
                 let mut buff = msg.clone().into_bytes();
                 // Resize the buff into msg_size, 0
-                msg.resize(MSG_SIZE, 0);
+                buff.resize(MSG_SIZE, 0);
                 // write all to the client passing in reference to buff, catch failure
                 client.write_all(&buff).expect("writing to socket failed");
                 // Print the message
