@@ -83,5 +83,7 @@ fn main() {
         // Handle quiting out (writing out :quit) or server (tx) sending an error using if statement
         if msg == ":quit" || tx.send(msg).is_err() { break }
     }
+
+    // Print out bye
     println!("Bye!");
 }
